@@ -1,0 +1,6 @@
+{
+  "name": "Koperasi Simpan Pinjam - Cabang Nubatukan",
+  "description": "Sistem Informasi Koperasi Simpan Pinjam Cabang Nubatukan dengan skema bunga 0,5% per bulan menurun, multi-role (Petugas Lapangan, Kepala Unit, Kepala Manager, Admin), dan dashboard progres bulanan & tahunan.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

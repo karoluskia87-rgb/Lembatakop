@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+body {
+  font-family: 'Source Sans 3', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: #ecf0f5;
+  color: #333333;
+}
+
+@media print {
+  body {
+    background-color: #ffffff !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  header, aside {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+    background: transparent !important;
+  }
+}

@@ -1,0 +1,521 @@
+import { User, Nasabah, Pinjaman, TransaksiSimpanan, EvaluasiUnit, PembinaanManager, CabangConfig } from '../types';
+import { hitungSimulasiBungaMenurun } from '../utils/loanCalculations';
+
+export const initialCabangConfig: CabangConfig = {
+  namaKoperasi: 'Koperasi Simpan Pinjam (KSP) Swasti Mandiri',
+  namaCabang: 'Kantor Cabang Nubatukan',
+  alamat: 'Jl. Trans Lembata No. 45, Lewoleba, Kec. Nubatukan',
+  kabupaten: 'Kabupaten Lembata',
+  provinsi: 'Nusa Tenggara Timur (NTT)',
+  telepon: '(0383) 21990 / 0812-3987-6543',
+  email: 'ksp.nubatukan@lembata.co.id',
+  kepalaCabang: 'Drs. Fransiskus Making',
+  bungaPerBulan: 0.5,
+  sistemBunga: 'Bunga 0,5% Per Bulan Menurun (Declining Balance)',
+};
+
+export const initialUsers: User[] = [
+  {
+    id: 'USR-001',
+    username: 'petugas',
+    name: 'Yohanes Bapa, S.E.',
+    role: 'petugas',
+    password: 'petugas123',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    phone: '0813-3921-8890',
+    email: 'yohanes.petugas@kspnubatukan.id',
+    status: 'aktif',
+    lastLogin: '12 Okt 2026, 08:15 WITA',
+  },
+  {
+    id: 'USR-002',
+    username: 'unit',
+    name: 'Maria Goreti Kewa, S.Ak.',
+    role: 'kepala_unit',
+    password: 'unit123',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+    phone: '0812-4672-1102',
+    email: 'maria.kewa@kspnubatukan.id',
+    status: 'aktif',
+    lastLogin: '12 Okt 2026, 08:30 WITA',
+  },
+  {
+    id: 'USR-003',
+    username: 'manager',
+    name: 'Drs. Fransiskus Making',
+    role: 'kepala_manager',
+    password: 'manager123',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+    phone: '0811-3810-4499',
+    email: 'frans.making@kspnubatukan.id',
+    status: 'aktif',
+    lastLogin: '12 Okt 2026, 07:50 WITA',
+  },
+  {
+    id: 'USR-004',
+    username: 'admin',
+    name: 'Stefanus Ola',
+    role: 'admin',
+    password: 'admin123',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+    phone: '0822-3765-9981',
+    email: 'admin.stefanus@kspnubatukan.id',
+    status: 'aktif',
+    lastLogin: '12 Okt 2026, 09:00 WITA',
+  },
+  {
+    id: 'USR-005',
+    username: 'petugas2',
+    name: 'Antonius Demon, S.P.',
+    role: 'petugas',
+    password: 'petugas123',
+    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80',
+    phone: '0813-5344-9021',
+    email: 'anton.demon@kspnubatukan.id',
+    status: 'aktif',
+    lastLogin: '11 Okt 2026, 16:40 WITA',
+  },
+];
+
+export const initialNasabah: Nasabah[] = [
+  {
+    id: 'NSB-001',
+    nik: '5308041505850001',
+    noKk: '5308042001100014',
+    nama: 'Petrus Laba Lamak',
+    alamat: 'Jl. Merdeka RT 04 / RW 02, Lewoleba Barat',
+    desa: 'Lewoleba Barat',
+    noHp: '0813-3987-1234',
+    namaPenjamin: 'Theresia Barek (Istri)',
+    nikPenjamin: '5308045508880003',
+    noHpKerabat: '0821-4567-8910',
+    hubunganKerabat: 'Kakak Kandung',
+    pekerjaan: 'Pedagang Kelontong Pasar Pada',
+    penghasilanBulanan: 6500000,
+    status: 'aktif',
+    tanggalDaftar: '2026-01-15',
+    petugasId: 'USR-001',
+    petugasNama: 'Yohanes Bapa, S.E.',
+  },
+  {
+    id: 'NSB-002',
+    nik: '5308042207900004',
+    noKk: '5308041103140025',
+    nama: 'Bernadus Kedang',
+    alamat: 'Dusun Lamahora Indah RT 08 / RW 03',
+    desa: 'Lamahora',
+    noHp: '0822-3611-9082',
+    namaPenjamin: 'Yuliana Murni (Istri)',
+    nikPenjamin: '5308046101920002',
+    noHpKerabat: '0812-3890-5544',
+    hubunganKerabat: 'Paman',
+    pekerjaan: 'Nelayan Tangkap & Pengering Ikan',
+    penghasilanBulanan: 5200000,
+    status: 'aktif',
+    tanggalDaftar: '2026-02-10',
+    petugasId: 'USR-001',
+    petugasNama: 'Yohanes Bapa, S.E.',
+  },
+  {
+    id: 'NSB-003',
+    nik: '5308044812820002',
+    noKk: '5308040509080031',
+    nama: 'Maria Bernadetha Ose',
+    alamat: 'Komp. Pasar Barter, Waijarang RT 02 / RW 01',
+    desa: 'Waijarang',
+    noHp: '0813-5321-7765',
+    namaPenjamin: 'Dominikus Ola (Suami)',
+    nikPenjamin: '5308041010800005',
+    noHpKerabat: '0852-3901-4432',
+    hubunganKerabat: 'Adik Ipar',
+    pekerjaan: 'Pengrajin Tenun Ikat Lembata & Warung Makan',
+    penghasilanBulanan: 7800000,
+    status: 'aktif',
+    tanggalDaftar: '2026-03-05',
+    petugasId: 'USR-001',
+    petugasNama: 'Yohanes Bapa, S.E.',
+  },
+  {
+    id: 'NSB-004',
+    nik: '5308041904780006',
+    noKk: '5308042306020018',
+    nama: 'Ignasius Loli',
+    alamat: 'Jl. Trans Lembata, Rayuan RT 05 / RW 02',
+    desa: 'Rayuan',
+    noHp: '0821-4477-8899',
+    namaPenjamin: 'Katarina Kewa (Istri)',
+    nikPenjamin: '5308045209800001',
+    noHpKerabat: '0812-4411-2233',
+    hubunganKerabat: 'Sepupu',
+    pekerjaan: 'Petani Jagung Hibrida & Peternak Sapi',
+    penghasilanBulanan: 4800000,
+    status: 'aktif',
+    tanggalDaftar: '2026-04-18',
+    petugasId: 'USR-005',
+    petugasNama: 'Antonius Demon, S.P.',
+  },
+  {
+    id: 'NSB-005',
+    nik: '5308046309930005',
+    noKk: '5308041407180009',
+    nama: 'Helena Barek Making',
+    alamat: 'Jl. Ahmad Yani, Selandoro RT 01 / RW 01',
+    desa: 'Selandoro',
+    noHp: '0823-3912-6655',
+    namaPenjamin: 'Kornelis Leu (Suami)',
+    nikPenjamin: '5308042502910003',
+    noHpKerabat: '0813-3900-7711',
+    hubunganKerabat: 'Bibi',
+    pekerjaan: 'Apoteker / Pemilik Toko Obat Nubatukan',
+    penghasilanBulanan: 9500000,
+    status: 'aktif',
+    tanggalDaftar: '2026-05-20',
+    petugasId: 'USR-001',
+    petugasNama: 'Yohanes Bapa, S.E.',
+  },
+];
+
+// Helper to build loans with precalculated declining schedule
+function buildInitialLoans(): Pinjaman[] {
+  // Pinjaman 1: Aktif, Berjalan 4 bulan lancar
+  const sim1 = hitungSimulasiBungaMenurun(15000000, 12, 0.5, '2026-05-10');
+  // Mark 4 installments as paid
+  for (let i = 0; i < 4; i++) {
+    sim1.jadwal[i].status = 'lunas';
+    sim1.jadwal[i].tanggalBayar = `2026-0${6 + i}-10`;
+    sim1.jadwal[i].kwitansiNo = `KWT-2026-0${6 + i}-008`;
+  }
+  const sisaPokok1 = sim1.jadwal[3].sisaPokokAkhir;
+
+  // Pinjaman 2: Aktif, Berjalan 3 bulan
+  const sim2 = hitungSimulasiBungaMenurun(10000000, 10, 0.5, '2026-06-15');
+  for (let i = 0; i < 3; i++) {
+    sim2.jadwal[i].status = 'lunas';
+    sim2.jadwal[i].tanggalBayar = `2026-0${7 + i}-14`;
+    sim2.jadwal[i].kwitansiNo = `KWT-2026-0${7 + i}-015`;
+  }
+  const sisaPokok2 = sim2.jadwal[2].sisaPokokAkhir;
+
+  // Pinjaman 3: Menunggu Evaluasi Kepala Unit (New proposal from field officer)
+  const sim3 = hitungSimulasiBungaMenurun(25000000, 24, 0.5, '2026-10-12');
+
+  // Pinjaman 4: Sudah Disetujui Kepala Unit, Menunggu Pembinaan & Otorisasi Manager (Plafon > 20 jt)
+  const sim4 = hitungSimulasiBungaMenurun(30000000, 24, 0.5, '2026-10-05');
+
+  // Pinjaman 5: Kol 2 DPK (Dalam Perhatian Khusus - terlambat 15 hari)
+  const sim5 = hitungSimulasiBungaMenurun(8000000, 8, 0.5, '2026-04-20');
+  for (let i = 0; i < 3; i++) {
+    sim5.jadwal[i].status = 'lunas';
+    sim5.jadwal[i].tanggalBayar = `2026-0${5 + i}-20`;
+    sim5.jadwal[i].kwitansiNo = `KWT-2026-0${5 + i}-021`;
+  }
+  sim5.jadwal[3].status = 'jatuh_tempo'; // perlu monitoring kepala unit
+
+  return [
+    {
+      id: 'PINJ-2026-001',
+      kodePinjaman: 'PJ-NBT-014',
+      nasabahId: 'NSB-001',
+      nasabahNama: 'Petrus Laba Lamak',
+      nik: '5308041505850001',
+      noHp: '0813-3987-1234',
+      tanggalPengajuan: '2026-05-08',
+      tanggalDisetujui: '2026-05-10',
+      jumlahPinjaman: 15000000,
+      tenorBulan: 12,
+      sukuBungaPerBulan: 0.5,
+      tujuanPinjaman: 'Penambahan stok sembako & ekspansi toko kelontong di Pasar Pada',
+      jaminan: 'BPKB Sepeda Motor Honda Vario 160 & Sertifikat Hak Milik No. 112/Lewoleba',
+      status: 'disetujui_manager',
+      kolektibilitas: 1,
+      sisaPokok: sisaPokok1,
+      angsuranTerbayar: 4,
+      totalAngsuranCount: 12,
+      petugasId: 'USR-001',
+      petugasNama: 'Yohanes Bapa, S.E.',
+      catatanUnit: 'Survei usaha layak, omzet per hari Rp 1.200.000, agunan valid.',
+      evaluatorUnit: 'Maria Goreti Kewa, S.Ak.',
+      tanggalEvaluasiUnit: '2026-05-09',
+      catatanManager: 'Disetujui, debitur memiliki riwayat simpanan yang tertib.',
+      evaluatorManager: 'Drs. Fransiskus Making',
+      tanggalApprovalManager: '2026-05-10',
+      jadwal: sim1.jadwal,
+    },
+    {
+      id: 'PINJ-2026-002',
+      kodePinjaman: 'PJ-NBT-015',
+      nasabahId: 'NSB-002',
+      nasabahNama: 'Bernadus Kedang',
+      nik: '5308042207900004',
+      noHp: '0822-3611-9082',
+      tanggalPengajuan: '2026-06-12',
+      tanggalDisetujui: '2026-06-15',
+      jumlahPinjaman: 10000000,
+      tenorBulan: 10,
+      sukuBungaPerBulan: 0.5,
+      tujuanPinjaman: 'Pengadaan mesin tempel perahu nelayan 15 PK & jaring tangkap ikan',
+      jaminan: 'BPKB Yamaha Jupiter MX & Surat Keterangan Usaha Kelautan Desa Lamahora',
+      status: 'disetujui_manager',
+      kolektibilitas: 1,
+      sisaPokok: sisaPokok2,
+      angsuranTerbayar: 3,
+      totalAngsuranCount: 10,
+      petugasId: 'USR-001',
+      petugasNama: 'Yohanes Bapa, S.E.',
+      catatanUnit: 'Karakter kooperatif, tangkapan laut stabil di Teluk Lewoleba.',
+      evaluatorUnit: 'Maria Goreti Kewa, S.Ak.',
+      tanggalEvaluasiUnit: '2026-06-14',
+      catatanManager: 'Dukungan pembiayaan sektor riil nelayan Nubatukan.',
+      evaluatorManager: 'Drs. Fransiskus Making',
+      tanggalApprovalManager: '2026-06-15',
+      jadwal: sim2.jadwal,
+    },
+    {
+      id: 'PINJ-2026-003',
+      kodePinjaman: 'PJ-NBT-016',
+      nasabahId: 'NSB-003',
+      nasabahNama: 'Maria Bernadetha Ose',
+      nik: '5308044812820002',
+      noHp: '0813-5321-7765',
+      tanggalPengajuan: '2026-10-10',
+      jumlahPinjaman: 25000000,
+      tenorBulan: 24,
+      sukuBungaPerBulan: 0.5,
+      tujuanPinjaman: 'Modal pembelian benang sutra pewarna alam & pesanan pameran tenun',
+      jaminan: 'Sertifikat Tanah Pekarangan No. 340/Waijarang',
+      status: 'menunggu_evaluasi',
+      kolektibilitas: 1,
+      sisaPokok: 25000000,
+      angsuranTerbayar: 0,
+      totalAngsuranCount: 24,
+      petugasId: 'USR-001',
+      petugasNama: 'Yohanes Bapa, S.E.',
+      jadwal: sim3.jadwal,
+    },
+    {
+      id: 'PINJ-2026-004',
+      kodePinjaman: 'PJ-NBT-017',
+      nasabahId: 'NSB-005',
+      nasabahNama: 'Helena Barek Making',
+      nik: '5308046309930005',
+      noHp: '0823-3912-6655',
+      tanggalPengajuan: '2026-10-02',
+      jumlahPinjaman: 30000000,
+      tenorBulan: 24,
+      sukuBungaPerBulan: 0.5,
+      tujuanPinjaman: 'Restok obat-obatan esensial dan alat tes kesehatan laboratorium mandiri',
+      jaminan: 'BPKB Mobil Daihatsu Gran Max & Izin Usaha Apotek',
+      status: 'disetujui_unit',
+      kolektibilitas: 1,
+      sisaPokok: 30000000,
+      angsuranTerbayar: 0,
+      totalAngsuranCount: 24,
+      petugasId: 'USR-001',
+      petugasNama: 'Yohanes Bapa, S.E.',
+      catatanUnit: 'Evaluasi 5C memenuhi syarat grade A (Skor 92). Rekomendasi plafon penuh dengan supervisi.',
+      evaluatorUnit: 'Maria Goreti Kewa, S.Ak.',
+      tanggalEvaluasiUnit: '2026-10-06',
+      jadwal: sim4.jadwal,
+    },
+    {
+      id: 'PINJ-2026-005',
+      kodePinjaman: 'PJ-NBT-018',
+      nasabahId: 'NSB-004',
+      nasabahNama: 'Ignasius Loli',
+      nik: '5308041904780006',
+      noHp: '0821-4477-8899',
+      tanggalPengajuan: '2026-04-18',
+      tanggalDisetujui: '2026-04-20',
+      jumlahPinjaman: 8000000,
+      tenorBulan: 8,
+      sukuBungaPerBulan: 0.5,
+      tujuanPinjaman: 'Pembelian bibit jagung manis & pakan konsentrat sapi Bali',
+      jaminan: 'Surat Kepemilikan Ternak (Kartu Ternak) & BPKB Motor Honda Revo',
+      status: 'disetujui_manager',
+      kolektibilitas: 2, // DPK
+      sisaPokok: sim5.jadwal[2].sisaPokokAkhir,
+      angsuranTerbayar: 3,
+      totalAngsuranCount: 8,
+      petugasId: 'USR-005',
+      petugasNama: 'Antonius Demon, S.P.',
+      catatanUnit: 'Panen jagung sempat tertunda musim hujan tidak menentu, diberi toleransi penagihan.',
+      evaluatorUnit: 'Maria Goreti Kewa, S.Ak.',
+      tanggalEvaluasiUnit: '2026-04-19',
+      catatanManager: 'Lakukan kunjungan lapangan pembinaan kelompok tani di Rayuan.',
+      evaluatorManager: 'Drs. Fransiskus Making',
+      tanggalApprovalManager: '2026-04-20',
+      jadwal: sim5.jadwal,
+    },
+  ];
+}
+
+export const initialPinjaman: Pinjaman[] = buildInitialLoans();
+
+export const initialSimpanan: TransaksiSimpanan[] = [
+  {
+    id: 'SMP-2026-001',
+    kodeTransaksi: 'TRX-SMP-01',
+    nasabahId: 'NSB-001',
+    nasabahNama: 'Petrus Laba Lamak',
+    jenisSimpanan: 'pokok',
+    tipe: 'setor',
+    jumlah: 500000,
+    tanggal: '2026-01-15',
+    keterangan: 'Setoran Simpanan Pokok Anggota Baru',
+    petugasId: 'USR-001',
+    petugasNama: 'Yohanes Bapa, S.E.',
+  },
+  {
+    id: 'SMP-2026-002',
+    kodeTransaksi: 'TRX-SMP-02',
+    nasabahId: 'NSB-001',
+    nasabahNama: 'Petrus Laba Lamak',
+    jenisSimpanan: 'wajib',
+    tipe: 'setor',
+    jumlah: 150000,
+    tanggal: '2026-09-10',
+    keterangan: 'Simpanan Wajib Bulan September 2026',
+    petugasId: 'USR-001',
+    petugasNama: 'Yohanes Bapa, S.E.',
+  },
+  {
+    id: 'SMP-2026-003',
+    kodeTransaksi: 'TRX-SMP-03',
+    nasabahId: 'NSB-002',
+    nasabahNama: 'Bernadus Kedang',
+    jenisSimpanan: 'sukarela',
+    tipe: 'setor',
+    jumlah: 1000000,
+    tanggal: '2026-09-28',
+    keterangan: 'Tabungan Sukarela Hasil Tangkapan Cumi',
+    petugasId: 'USR-001',
+    petugasNama: 'Yohanes Bapa, S.E.',
+  },
+  {
+    id: 'SMP-2026-004',
+    kodeTransaksi: 'TRX-SMP-04',
+    nasabahId: 'NSB-003',
+    nasabahNama: 'Maria Bernadetha Ose',
+    jenisSimpanan: 'sukarela',
+    tipe: 'setor',
+    jumlah: 2500000,
+    tanggal: '2026-10-01',
+    keterangan: 'Setoran Tabungan Penjualan Tenun Adat',
+    petugasId: 'USR-001',
+    petugasNama: 'Yohanes Bapa, S.E.',
+  },
+  {
+    id: 'SMP-2026-005',
+    kodeTransaksi: 'TRX-SMP-05',
+    nasabahId: 'NSB-005',
+    nasabahNama: 'Helena Barek Making',
+    jenisSimpanan: 'wajib',
+    tipe: 'setor',
+    jumlah: 200000,
+    tanggal: '2026-10-08',
+    keterangan: 'Simpanan Wajib Bulan Oktober 2026',
+    petugasId: 'USR-001',
+    petugasNama: 'Yohanes Bapa, S.E.',
+  },
+];
+
+export const initialEvaluasiUnit: EvaluasiUnit[] = [
+  {
+    id: 'EVL-001',
+    pinjamanId: 'PINJ-2026-004',
+    nasabahNama: 'Helena Barek Making',
+    tanggal: '2026-10-06',
+    evaluator: 'Maria Goreti Kewa, S.Ak.',
+    characterScore: 95,
+    capacityScore: 92,
+    capitalScore: 90,
+    collateralScore: 90,
+    conditionScore: 93,
+    rekomendasi: 'setuju',
+    catatanEvaluasi: 'Bisnis apotek sangat stabil di Nubatukan, izin usaha lengkap, perputaran kas sehat. Rekomendasi approval Kepala Manager.',
+    limitDisarankan: 30000000,
+  },
+  {
+    id: 'EVL-002',
+    pinjamanId: 'PINJ-2026-005',
+    nasabahNama: 'Ignasius Loli',
+    tanggal: '2026-04-19',
+    evaluator: 'Maria Goreti Kewa, S.Ak.',
+    characterScore: 85,
+    capacityScore: 78,
+    capitalScore: 75,
+    collateralScore: 80,
+    conditionScore: 82,
+    rekomendasi: 'setuju',
+    catatanEvaluasi: 'Peminjam loyal, aset ternak jelas. Perlu pendampingan agar panen disesuaikan siklus angsuran.',
+    limitDisarankan: 8000000,
+  },
+];
+
+export const initialPembinaanManager: PembinaanManager[] = [
+  {
+    id: 'PBN-001',
+    tanggal: '2026-10-08',
+    targetStaf: 'Semua Petugas Lapangan Cabang Nubatukan',
+    perihal: 'Strategi Penurunan NPL & Verifikasi Calon Debitur Wilayah Pesisir',
+    kategori: 'mitigasi_risiko',
+    isiArahan: 'Petugas lapangan wajib melakukan verifikasi fisik tempat usaha dan memastikan KTP penjamin serta kontak kerabat yang tidak serumah aktif dihubungi sebelum berkas diserahkan ke Kepala Unit.',
+    statusTindakLanjut: 'dalam_proses',
+    dibuatOleh: 'Drs. Fransiskus Making (Kepala Manager)',
+  },
+  {
+    id: 'PBN-002',
+    tanggal: '2026-09-25',
+    targetStaf: 'Yohanes Bapa, S.E.',
+    perihal: 'Apresiasi Pencapaian Target Simpanan & Penagihan Lancar Q3 2026',
+    kategori: 'apresiasi_target',
+    isiArahan: 'Apresiasi atas keberhasilan mencapai 112% target simpanan sukarela di sentra pasar Lewoleba. Pertahankan standar pelayanan ramah dan transparansi kuitansi.',
+    statusTindakLanjut: 'selesai',
+    dibuatOleh: 'Drs. Fransiskus Making (Kepala Manager)',
+  },
+  {
+    id: 'PBN-003',
+    tanggal: '2026-10-01',
+    targetStaf: 'Antonius Demon, S.P. & Maria Goreti Kewa, S.Ak.',
+    perihal: 'Pembinaan Kolektibilitas 2 Wilayah Rayuan & Mitigasi Risiko Gagal Panen',
+    kategori: 'pembinaan_npl',
+    isiArahan: 'Lakukan re-evaluasi skema penagihan untuk kelompok tani Rayuan pasca kekeringan ringan, usulkan restrukturisasi jika diperlukan agar tidak jatuh ke Kol 3.',
+    statusTindakLanjut: 'dalam_proses',
+    dibuatOleh: 'Drs. Fransiskus Making (Kepala Manager)',
+  },
+];
+
+// Data progres bulanan & tahunan Cabang Nubatukan
+export const dataProgres = {
+  tahunBerjalan: 2026,
+  bulanBerjalan: 'Oktober 2026',
+  targetTahunanPenyaluran: 1200000000, // 1.2 Milyar
+  realisasiTahunanPenyaluran: 965000000, // 80.4%
+  targetTahunanSimpanan: 800000000, // 800 Juta
+  realisasiTahunanSimpanan: 685000000, // 85.6%
+  targetBulananPenyaluran: 100000000, // 100 Juta
+  realisasiBulananPenyaluran: 88000000, // 88%
+  targetBulananSimpanan: 70000000,
+  realisasiBulananSimpanan: 66500000, // 95%
+  nplCabangPersen: 1.6, // Sangat sehat (< 5%)
+  kelancaranAngsuranPersen: 98.4,
+  trenBulanan: [
+    { bulan: 'Jan', penyaluran: 75, targetP: 80, simpanan: 52, targetS: 50 },
+    { bulan: 'Feb', penyaluran: 82, targetP: 80, simpanan: 58, targetS: 55 },
+    { bulan: 'Mar', penyaluran: 90, targetP: 85, simpanan: 64, targetS: 60 },
+    { bulan: 'Apr', penyaluran: 85, targetP: 90, simpanan: 68, targetS: 60 },
+    { bulan: 'Mei', penyaluran: 105, targetP: 95, simpanan: 72, targetS: 65 },
+    { bulan: 'Jun', penyaluran: 110, targetP: 100, simpanan: 75, targetS: 65 },
+    { bulan: 'Jul', penyaluran: 98, targetP: 100, simpanan: 70, targetS: 70 },
+    { bulan: 'Agu', penyaluran: 115, targetP: 100, simpanan: 80, targetS: 70 },
+    { bulan: 'Sep', penyaluran: 117, targetP: 100, simpanan: 82, targetS: 70 },
+    { bulan: 'Okt', penyaluran: 88, targetP: 100, simpanan: 66, targetS: 70 }, // berjalan
+  ],
+  distribusiKolektibilitas: [
+    { label: 'Kol 1 - Lancar', jumlahDebitur: 142, persentase: 94.7, color: '#00a65a' },
+    { label: 'Kol 2 - DPK', jumlahDebitur: 5, persentase: 3.3, color: '#00c0ef' },
+    { label: 'Kol 3 - Kurang Lancar', jumlahDebitur: 2, persentase: 1.3, color: '#f39c12' },
+    { label: 'Kol 4 - Diragukan', jumlahDebitur: 1, persentase: 0.7, color: '#ff851b' },
+    { label: 'Kol 5 - Macet', jumlahDebitur: 0, persentase: 0.0, color: '#dd4b39' },
+  ],
+};
